@@ -1,5 +1,6 @@
 from selenium.webdriver.common.by import By
 from pages.base_page import BasePage
+from selenium.webdriver.support.ui import WebDriverWait
 
 class HomePage(BasePage):
     BROWSE_BUTTON = (By.XPATH, "//div[contains(text(), 'Browse')]")
