@@ -15,9 +15,9 @@ def test_mobile_twitch_flow(driver):
 
     home.open()
     home.setup_network_tracker()
-    step(home.click_browse(), "Browse button not found")
-    step(home.search_game("StarCraft II"), "Search input not found")
-    step(search.select_game("StarCraft II"), "Game not found in search results")
-    step(search.scroll_and_click_first_article(), "Article not clickable")
+    step(home.click_browse, "Browse button not found")
+    step(lambda: home.search_game("StarCraft II"), "Search input not found")
+    step(lambda: search.select_game("StarCraft II"), "Game not found in search results")
+    step(search.scroll_and_click_first_article, "Article not clickable")
     player.wait_until_video_plays()
     player.take_screenshot("player_loaded.png")

@@ -21,22 +21,21 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Install Chrome and Chromedriver
+      - name: Install Chrome, Chromedriver, and Xvfb
         run: |
           sudo apt-get update
-          sudo apt-get install -y wget unzip xvfb
+          sudo apt-get install -y wget unzip xvfb jq
           wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
           sudo apt install -y ./google-chrome-stable_current_amd64.deb
-          CHROME_VERSION=$(google-chrome --version | grep -oP '\d+\.\d+\.\d+\.\d+')
           DRIVER_VERSION=$(curl -s "https://googlechromelabs.github.io/chrome-for-testing/last-known-good-versions-with-downloads.json" | jq -r ".channels.Stable.version")
           wget "https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/$DRIVER_VERSION/linux64/chromedriver-linux64.zip"
           unzip chromedriver-linux64.zip
           sudo mv chromedriver-linux64/chromedriver /usr/local/bin/
           sudo chmod +x /usr/local/bin/chromedriver
 
-      - name: Run Selenium tests
+      - name: Run Selenium tests with Xvfb
         run: |
-          python3 -m pytest -o log_cli=true -o log_cli_level=INFO -v tests/ --html=report.html --self-contained-html
+          xvfb-run -s "-screen 0 1920x1080x24" python3 -m pytest -o log_cli=true -o log_cli_level=INFO -v tests/ --html=report.html --self-contained-html
 
       - name: Upload screenshots
         if: always()
