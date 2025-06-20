@@ -12,16 +12,28 @@ class BasePage:
         self.wait = WebDriverWait(driver, timeout)
 
     def click(self, by_locator):
-        element = self.wait.until(EC.element_to_be_clickable(by_locator))
-        element.click()
+        try:
+            element = self.wait.until(EC.element_to_be_clickable(by_locator))
+            element.click()
+        except Exception as e:
+            self.take_screenshot("click_exception")
+            raise e
 
     def enter_text(self, by_locator, text):
-        element = self.wait.until(EC.presence_of_element_located(by_locator))
-        element.clear()
-        element.send_keys(text)
+        try:
+            element = self.wait.until(EC.presence_of_element_located(by_locator))
+            element.clear()
+            element.send_keys(text)
+        except Exception as e:
+            self.take_screenshot("enter_text_exception")
+            raise e
 
     def wait_for_title(self, title_fragment):
-        self.wait.until(EC.title_contains(title_fragment))
+        try:
+            self.wait.until(EC.title_contains(title_fragment))
+        except Exception as e:
+            self.take_screenshot("wait_for_title_exception")
+            raise e
 
     def get_element(self, by_locator):
         return self.wait.until(EC.presence_of_element_located(by_locator))
@@ -66,9 +78,13 @@ class BasePage:
         raise TimeoutError("Timed out waiting for network to become idle")
 
     def wait_for_dom_loaded(self, timeout=10):
-        WebDriverWait(self.driver, timeout).until(
-            lambda d: d.execute_script("return document.readyState") in ["interactive", "complete"]
-        )
+        try:
+            WebDriverWait(self.driver, timeout).until(
+                lambda d: d.execute_script("return document.readyState") in ["interactive", "complete"]
+            )
+        except Exception as e:
+            self.take_screenshot("wait_for_dom_loaded_exception")
+            raise e
 
     def wait_for_dom_and_network(self):
         self.wait_for_dom_loaded()
