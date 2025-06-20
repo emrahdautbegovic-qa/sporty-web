@@ -25,18 +25,17 @@ class HomePage(BasePage):
         consent_banner_locator = (By.CLASS_NAME, "consent-banner")
         button_locator = (
             By.XPATH,
-            "//div[contains(@class,'consent-banner')]//button[contains(text(), 'Accept') or contains(text(), 'Got it') or contains(text(), 'Dismiss')]"
+            "//div[contains(@class,'consent-banner')]//button[" +
+            "contains(text(), 'Accept') or contains(text(), 'Got it') or contains(text(), 'Dismiss') or contains(text(), 'Proceed') or contains(text(), 'Continue')"
+            + "]"
         )
         try:
-            # Wait for banner to appear (short timeout)
             WebDriverWait(self.driver, timeout).until(
                 lambda d: d.find_element(*consent_banner_locator).is_displayed()
             )
-            # Try clicking the dismiss button if found and interactable
             button = self.driver.find_element(*button_locator)
             if button.is_displayed() and button.is_enabled():
                 button.click()
                 self.wait_for_dom_and_network()
         except (TimeoutException, NoSuchElementException):
-            # Consent banner or button not found — no problem, proceed
             pass
