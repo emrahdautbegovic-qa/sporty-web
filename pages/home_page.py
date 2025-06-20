@@ -19,13 +19,22 @@ class HomePage(BasePage):
         self.enter_text(self.SEARCH_INPUT, game_name)
         self.wait_for_dom_and_network()
     
-    def dismiss_consent_banner(self):
+    def dismiss_consent_banner(self, timeout=5):
         try:
-            banner = self.driver.find_element(By.CLASS_NAME, "consent-banner")
-            button = banner.find_element(By.XPATH, ".//button[contains(text(), 'Accept') or contains(text(), 'Got it') or contains(text(), 'Dismiss')]")
-            if button.is_displayed():
+            consent_banner_locator = (By.CLASS_NAME, "consent-banner")
+            button_locator = (
+                By.XPATH,
+                "//div[contains(@class,'consent-banner')]//button[contains(text(), 'Accept') or contains(text(), 'Got it') or contains(text(), 'Dismiss')]"
+            )
+            # Wait for banner to appear (short timeout)
+            WebDriverWait(self.driver, timeout).until(
+                lambda d: d.find_element(*consent_banner_locator).is_displayed()
+            )
+            # Try clicking the dismiss button if found
+            button = self.driver.find_element(*button_locator)
+            if button.is_displayed() and button.is_enabled():
                 button.click()
                 self.wait_for_dom_and_network()
-        except Exception:
-            # Banner may not exist — ignore safely
+        except (TimeoutException, NoSuchElementException):
+            # Banner or button not found — safe to continue
             pass
