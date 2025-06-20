@@ -9,6 +9,7 @@ class HomePage(BasePage):
         self.driver.get("https://m.twitch.tv/")
         self.wait_for_title("Twitch")
         self.wait_for_dom_and_network()
+        self.dismiss_consent_banner()
 
     def click_browse(self):
         self.click(self.BROWSE_BUTTON)
@@ -17,3 +18,14 @@ class HomePage(BasePage):
     def search_game(self, game_name):
         self.enter_text(self.SEARCH_INPUT, game_name)
         self.wait_for_dom_and_network()
+    
+    def dismiss_consent_banner(self):
+        try:
+            banner = self.driver.find_element(By.CLASS_NAME, "consent-banner")
+            button = banner.find_element(By.XPATH, ".//button[contains(text(), 'Accept') or contains(text(), 'Got it') or contains(text(), 'Dismiss')]")
+            if button.is_displayed():
+                button.click()
+                self.wait_for_dom_and_network()
+        except Exception:
+            # Banner may not exist — ignore safely
+            pass
